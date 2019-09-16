@@ -15,12 +15,25 @@ class App extends React.Component {
       fetchedUser: null,
       token: null,
       request: null,
-      fetchedUsers: null
+      fetchedUsers: null,
+      groups: null
     };
   }
 
   componentDidMount() {
-    localStorage.getItem("theme");
+    const fetchUser = new Promise((resolve, reject) => {
+      connect.send("VKWebAppGetUserInfo", {});
+      resolve(
+        connect.send("VKWebAppGetAuthToken", {
+          app_id: 7136184,
+          scope: "groups"
+        })
+      );
+      reject();
+    });
+    fetchUser.then(res => {
+      console.log(res);
+    });
     connect.subscribe(e => {
       switch (e.detail.type) {
         case "VKWebAppGetUserInfoResult":
@@ -41,6 +54,7 @@ class App extends React.Component {
                 v: "5.101"
               }
             });
+
             console.log(this.state.token.toString());
           }
           break;
@@ -56,7 +70,6 @@ class App extends React.Component {
           console.log(e.detail.data.error_data);
       }
     });
-    connect.send("VKWebAppGetUserInfo", {});
   }
   getGroup() {
     if (this.state.token) {

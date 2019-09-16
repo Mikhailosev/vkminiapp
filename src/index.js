@@ -8,10 +8,6 @@ import App from "./App";
 
 // Init VK  Mini App
 connect.send("VKWebAppInit", {});
-connect.send("VKWebAppGetAuthToken", {
-  app_id: 7136184,
-  scope: "groups"
-});
 window.onload = () => {
   if (localStorage.getItem("theme") === "client-light") {
     document.body.setAttribute("scheme", "client_dark");
