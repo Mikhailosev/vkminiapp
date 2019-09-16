@@ -1,4 +1,5 @@
-import React from "react";
+import React, { Component } from "react";
+
 import PropTypes from "prop-types";
 import {
   Panel,
@@ -7,66 +8,99 @@ import {
   Group,
   Div,
   Avatar,
-  PanelHeader
+  PanelHeader,
+  Spinner,
+  PanelSpinner
 } from "@vkontakte/vkui";
 
-const Home = ({ id, go, fetchedUser, token, request, groups }) => {
-  var allGroups = null;
-  if (groups) {
-    allGroups = groups.items.map(group => {
-      return (
-        <ListItem
-          key={group.id}
-          before={group.photo_200 ? <Avatar src={group.photo_200} /> : null}
-          description={
-            group.is_admin === 1 ? <p>Администратор</p> : <p>Читатель</p>
-          }
-        >
-          {`${group.name}`}
-        </ListItem>
-      );
-    });
-  } else {
-    return <p>Groups Loading</p>;
+class Home extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      switched: null
+    };
   }
-
-  return (
-    <Panel id={id}>
-      <h2>{localStorage.getItem("user")}</h2>
-
-      <PanelHeader>Example</PanelHeader>
-      {fetchedUser && (
-        <Group title="User Data Fetched with VK Connect">
+  switchTheme = () => {
+    let theme = localStorage.getItem("theme");
+    localStorage.setItem(
+      "theme",
+      `${theme === "client-dark" ? "client-light" : "client-dark"}`
+    );
+    this.setState({
+      switched: "The mode is now switched, please reload the page"
+    });
+  };
+  render() {
+    let allGroups = null;
+    if (this.props.groups) {
+      allGroups = this.props.groups.items.map(group => {
+        return (
           <ListItem
-            before={
-              fetchedUser.photo_200 ? (
-                <Avatar src={fetchedUser.photo_200} />
-              ) : null
-            }
+            key={group.id}
+            before={group.photo_200 ? <Avatar src={group.photo_200} /> : null}
             description={
-              fetchedUser.city && fetchedUser.city.title
-                ? fetchedUser.city.title
-                : ""
+              group.is_admin === 1 ? <p>Администратор</p> : <p>Читатель</p>
             }
           >
-            {`${fetchedUser.first_name} ${fetchedUser.last_name}`}
+            {`${group.name}`}
           </ListItem>
-        </Group>
-      )}
+        );
+      });
+    }
+    return (
+      <Panel id={this.props.id}>
+        <PanelHeader>Example</PanelHeader>
+        {this.props.fetchedUser && (
+          <Group title="User Data Fetched with VK Connect">
+            <ListItem
+              before={
+                this.props.fetchedUser.photo_200 ? (
+                  <Avatar src={this.props.fetchedUser.photo_200} />
+                ) : (
+                  <PanelSpinner></PanelSpinner>
+                )
+              }
+              description={
+                this.props.fetchedUser.city && this.props.fetchedUser.city.title
+                  ? this.props.fetchedUser.city.title
+                  : ""
+              }
+            >
+              {`${this.props.fetchedUser.first_name} ${this.props.fetchedUser.last_name}`}
+            </ListItem>
+          </Group>
+        )}
 
-      <Group title="Navigation Example">
-        <Div>
-          <Button size="xl" level="2" onClick={go} data-to="persik">
-            Show me the Persik, please
-            <br></br>
-            {token}
-          </Button>
-        </Div>
-      </Group>
-      <Group title={`All Groups : ${groups.count}`}>{allGroups}</Group>
-    </Panel>
-  );
-};
+        <Group title="Navigation Example">
+          <Div>
+            <Button
+              size="xl"
+              level="2"
+              onClick={this.props.go}
+              data-to="persik"
+            >
+              Show me the Persik, please
+              <br></br>
+              {this.props.token}
+            </Button>
+          </Div>
+        </Group>
+        <Button size="xl" level="2" onClick={this.switchTheme}>
+          {!this.state.switched
+            ? "Click here to switch Mode"
+            : this.state.switched}
+        </Button>
+        {this.props.groups ? (
+          <Group title={`All Groups : ${this.props.groups.count}`}>
+            {allGroups}
+          </Group>
+        ) : (
+          <Spinner size="large"></Spinner>
+        )}
+      </Panel>
+    );
+  }
+}
 
 Home.propTypes = {
   id: PropTypes.string.isRequired,

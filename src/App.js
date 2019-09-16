@@ -20,6 +20,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+    localStorage.getItem("theme");
     connect.subscribe(e => {
       switch (e.detail.type) {
         case "VKWebAppGetUserInfoResult":
