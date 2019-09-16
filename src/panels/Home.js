@@ -36,6 +36,7 @@ const Home = ({ id, go, fetchedUser, token }) => (
       <Div>
         <Button size="xl" level="2" onClick={go} data-to="persik">
           Show me the Persik, please
+          {localStorage.getItem("token")}
           {token}
         </Button>
       </Div>
