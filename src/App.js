@@ -13,7 +13,9 @@ class App extends React.Component {
     this.state = {
       activePanel: "home",
       fetchedUser: null,
-      token: null
+      token: null,
+      request: null,
+      fetchedUsers: null
     };
   }
 
@@ -22,18 +24,43 @@ class App extends React.Component {
       switch (e.detail.type) {
         case "VKWebAppGetUserInfoResult":
           this.setState({ fetchedUser: e.detail.data });
+          console.log(this.state.fetchedUser);
           break;
         case "VKWebAppAccessTokenReceived":
-          this.setState({ token: e.detail.data.access_token });
-          localStorage.setItem(`token`, `${e.detail.data.access_token}`);
+          if (this.state.fetchedUser !== null) {
+            this.setState({ token: e.detail.data.access_token });
+            connect.send("VKWebAppCallAPIMethod", {
+              method: "groups.get",
+              request_id: "getUserGroups",
+              params: {
+                user_id: this.state.fetchedUser.id,
+                access_token: this.state.token.toString(),
+                extended: 1,
+                count: 999,
+                v: "5.101"
+              }
+            });
+            console.log(this.state.token.toString());
+          }
           break;
         default:
-          console.log(e.detail.type);
+          console.log(e.detail.data.error_data);
+      }
+      switch (e.detail.data.request_id) {
+        case "getUserGroups":
+          this.setState({ groups: e.detail.data.response });
+          console.log(this.state.groups);
+          break;
+        default:
+          console.log(e.detail.data.error_data);
       }
     });
     connect.send("VKWebAppGetUserInfo", {});
   }
-
+  getGroup() {
+    if (this.state.token) {
+    }
+  }
   go = e => {
     this.setState({ activePanel: e.currentTarget.dataset.to });
   };
@@ -43,9 +70,12 @@ class App extends React.Component {
       <View activePanel={this.state.activePanel}>
         <Home
           id="home"
+          request={this.state.request}
           token={this.state.token}
           fetchedUser={this.state.fetchedUser}
           go={this.go}
+          fetchedUsers={this.state.fetchedUsers}
+          groups={this.state.groups}
         />
         <Persik id="persik" go={this.go} />
       </View>
