@@ -12,7 +12,8 @@ class App extends React.Component {
 
     this.state = {
       activePanel: "home",
-      fetchedUser: null
+      fetchedUser: null,
+      token: null
     };
   }
 
@@ -21,6 +22,10 @@ class App extends React.Component {
       switch (e.detail.type) {
         case "VKWebAppGetUserInfoResult":
           this.setState({ fetchedUser: e.detail.data });
+          break;
+        case "VKWebAppAccessTokenReceived":
+          this.setState({ token: e.detail.data.access_token });
+          localStorage.setItem(`token`, `${e.detail.data.access_token}`);
           break;
         default:
           console.log(e.detail.type);
@@ -36,7 +41,12 @@ class App extends React.Component {
   render() {
     return (
       <View activePanel={this.state.activePanel}>
-        <Home id="home" fetchedUser={this.state.fetchedUser} go={this.go} />
+        <Home
+          id="home"
+          token={this.state.token}
+          fetchedUser={this.state.fetchedUser}
+          go={this.go}
+        />
         <Persik id="persik" go={this.go} />
       </View>
     );

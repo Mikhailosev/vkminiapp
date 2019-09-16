@@ -1,13 +1,17 @@
-import 'core-js/features/map';
-import 'core-js/features/set';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import connect from '@vkontakte/vk-connect';
-import App from './App';
+import "core-js/features/map";
+import "core-js/features/set";
+import React from "react";
+import ReactDOM from "react-dom";
+import connect from "@vkontakte/vk-connect";
+import App from "./App";
 // import registerServiceWorker from './sw';
 
 // Init VK  Mini App
-connect.send('VKWebAppInit', {});
+connect.send("VKWebAppInit", {});
+connect.send("VKWebAppGetAuthToken", {
+  app_id: 7136184,
+  scope: "groups"
+});
 
 // Если вы хотите, чтобы ваше веб-приложение работало в оффлайне и загружалось быстрее,
 // расскомментируйте строку с registerServiceWorker();
@@ -15,4 +19,4 @@ connect.send('VKWebAppInit', {});
 // Подробнее про сервис воркеры можно почитать тут — https://vk.cc/8MHpmT
 // registerServiceWorker();
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById("root"));
