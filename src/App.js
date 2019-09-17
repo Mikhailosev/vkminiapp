@@ -2,9 +2,10 @@ import React from "react";
 import connect from "@vkontakte/vk-connect";
 import { View } from "@vkontakte/vkui";
 import "@vkontakte/vkui/dist/vkui.css";
-
+import GroupView from "./panels/GroupView";
 import Home from "./panels/Home";
 import Persik from "./panels/Persik";
+import Settings from "./panels/Settings";
 
 class App extends React.Component {
   constructor(props) {
@@ -16,7 +17,8 @@ class App extends React.Component {
       token: null,
       request: null,
       fetchedUsers: null,
-      groups: null
+      groups: null,
+      group: null
     };
   }
 
@@ -59,7 +61,7 @@ class App extends React.Component {
           }
           break;
         default:
-          console.log(e.detail.data.error_data);
+          console.log(e.detail.data);
       }
       switch (e.detail.data.request_id) {
         case "getUserGroups":
@@ -75,13 +77,20 @@ class App extends React.Component {
     if (this.state.token) {
     }
   }
-  go = e => {
+  go = (e, group) => {
     this.setState({ activePanel: e.currentTarget.dataset.to });
+    this.setState({ group: group });
   };
 
   render() {
     return (
       <View activePanel={this.state.activePanel}>
+        <Settings
+          id="settings"
+          fetchedUser={this.state.fetchedUser}
+          go={this.go}
+        ></Settings>
+        <GroupView data={this.state.group} id="group" go={this.go} />
         <Home
           id="home"
           request={this.state.request}

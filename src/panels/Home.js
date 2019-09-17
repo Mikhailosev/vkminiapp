@@ -12,13 +12,15 @@ import {
   Spinner,
   PanelSpinner
 } from "@vkontakte/vkui";
+import Icon28SettingsOutline from "@vkontakte/icons/dist/28/settings_outline";
 
 class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       switched: null,
-      admin: false
+      admin: false,
+      active: false
     };
   }
   switchTheme = () => {
@@ -31,12 +33,16 @@ class Home extends Component {
       switched: "The mode is now switched, please reload the page"
     });
   };
+
   handleGroups = () => {
     if (this.state.admin === true) {
       return this.props.groups.items.map(group => {
         if (group.is_admin === 1) {
           return (
             <ListItem
+              data={group}
+              onClick={this.props.go}
+              data-to="group"
               key={group.id}
               before={group.photo_200 ? <Avatar src={group.photo_200} /> : null}
               description={
@@ -52,6 +58,10 @@ class Home extends Component {
       return this.props.groups.items.map(group => {
         return (
           <ListItem
+            onClick={e => {
+              this.props.go(e, group);
+            }}
+            data-to="group"
             key={group.id}
             before={group.photo_200 ? <Avatar src={group.photo_200} /> : null}
             description={
@@ -65,6 +75,66 @@ class Home extends Component {
     }
   };
   render() {
+    const buttons = () => {
+      if (this.state.admin === true) {
+        return (
+          <Div style={{ display: "flex" }}>
+            <Button
+              size="l"
+              level="secondary"
+              onClick={() => {
+                this.setState({ admin: false });
+              }}
+              stretched
+            >
+              All
+            </Button>
+            <Button
+              size="l"
+              onClick={() => {
+                this.setState({ admin: true });
+              }}
+              stretched
+              level="primary"
+            >
+              Admin
+            </Button>
+          </Div>
+        );
+      } else {
+        return (
+          <Div style={{ display: "flex" }}>
+            <Button
+              style={{
+                marginRight: "10px"
+              }}
+              size="l"
+              level="primary"
+              onClick={() => {
+                this.setState({ admin: false });
+              }}
+              stretched
+            >
+              All
+            </Button>
+            <Button
+              style={{
+                marginLeft: "10px"
+              }}
+              size="l"
+              onClick={() => {
+                this.setState({ admin: true });
+              }}
+              stretched
+              level="secondary"
+            >
+              Admin
+            </Button>
+          </Div>
+        );
+      }
+    };
+
     return (
       <Panel id={this.props.id}>
         <PanelHeader>Example</PanelHeader>
@@ -85,6 +155,15 @@ class Home extends Component {
               }
             >
               {`${this.props.fetchedUser.first_name} ${this.props.fetchedUser.last_name}`}
+              <Icon28SettingsOutline
+                data-to="settings"
+                onClick={this.props.go}
+                style={{
+                  position: "absolute",
+                  right: "20px",
+                  top: "20px"
+                }}
+              ></Icon28SettingsOutline>
             </ListItem>
           </Group>
         )}
@@ -109,28 +188,7 @@ class Home extends Component {
         </Button>
         {this.props.groups ? (
           <Group title={`All Groups : ${this.props.groups.count}`}>
-            <Div style={{ display: "flex" }}>
-              <Button
-                size="l"
-                onClick={() => {
-                  this.setState({ admin: false });
-                }}
-                stretched
-                style={{ marginRight: 8 }}
-              >
-                All
-              </Button>
-              <Button
-                size="l"
-                onClick={() => {
-                  this.setState({ admin: true });
-                }}
-                stretched
-                level="secondary"
-              >
-                Admin
-              </Button>
-            </Div>
+            {buttons()}
             {this.handleGroups()}
           </Group>
         ) : (
