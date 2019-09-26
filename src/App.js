@@ -23,55 +23,64 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const fetchUser = new Promise((resolve, reject) => {
-      connect.send("VKWebAppGetUserInfo", {});
-      resolve(
-        connect.send("VKWebAppGetAuthToken", {
-          app_id: 7136184,
-          scope: "groups"
-        })
-      );
-      reject();
-    });
-    fetchUser.then(res => {
-      console.log(res);
-    });
-    connect.subscribe(e => {
-      switch (e.detail.type) {
-        case "VKWebAppGetUserInfoResult":
-          this.setState({ fetchedUser: e.detail.data });
-          console.log(this.state.fetchedUser);
-          break;
-        case "VKWebAppAccessTokenReceived":
-          if (this.state.fetchedUser !== null) {
-            this.setState({ token: e.detail.data.access_token });
-            connect.send("VKWebAppCallAPIMethod", {
-              method: "groups.get",
-              request_id: "getUserGroups",
-              params: {
-                user_id: this.state.fetchedUser.id,
-                access_token: this.state.token.toString(),
-                extended: 1,
-                count: 999,
-                v: "5.101"
-              }
-            });
+    connect
+      .sendPromise("VKWebAppGetUserInfo")
+      .then(data => {
+        // Handling received data
+        console.log(data.email);
+      })
+      .catch(error => {
+        // Handling an error
+      });
+    // const fetchUser = new Promise((resolve, reject) => {
+    //   connect.send("VKWebAppGetUserInfo", {});
+    //   resolve(
+    //     connect.send("VKWebAppGetAuthToken", {
+    //       app_id: 7136184,
+    //       scope: "groups"
+    //     })
+    //   );
+    //   reject();
+    // });
+    // fetchUser.then(res => {
+    //   console.log(res);
+    // });
+    // connect.subscribe(e => {
+    //   switch (e.detail.type) {
+    //     case "VKWebAppGetUserInfoResult":
+    //       this.setState({ fetchedUser: e.detail.data });
+    //       console.log(this.state.fetchedUser);
+    //       break;
+    //     case "VKWebAppAccessTokenReceived":
+    //       if (this.state.fetchedUser !== null) {
+    //         this.setState({ token: e.detail.data.access_token });
+    //         connect.send("VKWebAppCallAPIMethod", {
+    //           method: "groups.get",
+    //           request_id: "getUserGroups",
+    //           params: {
+    //             user_id: this.state.fetchedUser.id,
+    //             access_token: this.state.token.toString(),
+    //             extended: 1,
+    //             count: 999,
+    //             v: "5.101"
+    //           }
+    //         });
 
-            console.log(this.state.token.toString());
-          }
-          break;
-        default:
-          console.log(e.detail.data);
-      }
-      switch (e.detail.data.request_id) {
-        case "getUserGroups":
-          this.setState({ groups: e.detail.data.response });
-          console.log(this.state.groups);
-          break;
-        default:
-          console.log(e.detail.data.error_data);
-      }
-    });
+    //         console.log(this.state.token.toString());
+    //       }
+    //       break;
+    //     default:
+    //       console.log(e.detail.data);
+    //   }
+    //   switch (e.detail.data.request_id) {
+    //     case "getUserGroups":
+    //       this.setState({ groups: e.detail.data.response });
+    //       console.log(this.state.groups);
+    //       break;
+    //     default:
+    //       console.log(e.detail.data.error_data);
+    //   }
+    // });
   }
   getGroup() {
     if (this.state.token) {

@@ -36,6 +36,7 @@ class Home extends Component {
 
   handleGroups = () => {
     if (this.state.admin === true) {
+      // eslint-disable-next-line
       return this.props.groups.items.map(group => {
         if (group.is_admin === 1) {
           return (
